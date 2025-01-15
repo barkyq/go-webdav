@@ -32,7 +32,7 @@ func TestPropFindSupportedCalendarComponent(t *testing.T) {
 		req.Body = io.NopCloser(strings.NewReader(propFindSupportedCalendarComponentRequest))
 		req.Header.Set("Content-Type", "application/xml")
 		w := httptest.NewRecorder()
-		handler := Handler{Backend: testBackend{calendars: []Calendar{*calendar}}}
+		handler := Handler{Backend: &testBackend{calendars: []Calendar{*calendar}}}
 		handler.ServeHTTP(w, req)
 
 		res := w.Result()
@@ -67,7 +67,7 @@ func TestPropFindRoot(t *testing.T) {
 	req.Header.Set("Content-Type", "application/xml")
 	w := httptest.NewRecorder()
 	calendar := &Calendar{}
-	handler := Handler{Backend: testBackend{calendars: []Calendar{*calendar}}}
+	handler := Handler{Backend: &testBackend{calendars: []Calendar{*calendar}}}
 	handler.ServeHTTP(w, req)
 
 	res := w.Result()
@@ -117,7 +117,7 @@ func TestMultiCalendarBackend(t *testing.T) {
 	req := httptest.NewRequest("PROPFIND", "/user/calendars/", strings.NewReader(propFindUserPrincipal))
 	req.Header.Set("Content-Type", "application/xml")
 	w := httptest.NewRecorder()
-	handler := Handler{Backend: testBackend{
+	handler := Handler{Backend: &testBackend{
 		calendars: calendars,
 		objectMap: map[string][]CalendarObject{
 			calendarB.Path: []CalendarObject{object},
@@ -280,7 +280,7 @@ func TestPropFindAllPropAndQuery(t *testing.T) {
 		Data: cal,
 		ETag: "191382932849",
 	}
-	handler := Handler{Backend: testBackend{
+	handler := Handler{Backend: &testBackend{
 		calendars: []Calendar{calendar},
 		objectMap: map[string][]CalendarObject{
 			calendar.Path: []CalendarObject{object},
@@ -450,7 +450,7 @@ func TestFindMultiget(t *testing.T) {
 		Data: cal,
 		ETag: "191382932850",
 	}
-	handler := Handler{Backend: testBackend{
+	handler := Handler{Backend: &testBackend{
 		calendars: []Calendar{calendar},
 		objectMap: map[string][]CalendarObject{
 			calendar.Path: []CalendarObject{object1, object2},
@@ -486,7 +486,7 @@ type testBackend struct {
 	objectMap map[string][]CalendarObject
 }
 
-func (t testBackend) CreateCalendar(ctx context.Context, calendar *Calendar) error {
+func (t *testBackend) CreateCalendar(ctx context.Context, calendar *Calendar) error {
 	return nil
 }
 
@@ -511,7 +511,7 @@ func (t testBackend) CurrentUserPrincipal(ctx context.Context) (string, error) {
 	return "/user/", nil
 }
 
-func (t testBackend) DeleteCalendarObject(ctx context.Context, path string) error {
+func (t *testBackend) DeleteCalendarObject(ctx context.Context, path string) error {
 	return nil
 }
 
@@ -526,7 +526,7 @@ func (t testBackend) GetCalendarObject(ctx context.Context, path string, req *Ca
 	return nil, fmt.Errorf("Couldn't find calendar object at: %s", path)
 }
 
-func (t testBackend) PutCalendarObject(ctx context.Context, path string, calendar *ical.Calendar, opts *PutCalendarObjectOptions) (*CalendarObject, error) {
+func (t *testBackend) PutCalendarObject(ctx context.Context, path string, calendar *ical.Calendar, opts *PutCalendarObjectOptions) (*CalendarObject, error) {
 	return nil, nil
 }
 
