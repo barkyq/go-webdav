@@ -112,6 +112,8 @@ func (h *Handler) handleMkCalendar(w http.ResponseWriter, r *http.Request) error
 			}
 		}
 
+		cal.Color = m.CalendarColor
+
 		cal.Name = m.DisplayName
 		cal.Description = m.CalendarDescription
 
@@ -604,6 +606,14 @@ func (b *backend) propFindCalendar(ctx context.Context, propfind *internal.PropF
 				return &calendarTimezone{Data: buf.Bytes()}, nil
 			}
 		}
+
+		// color should be hex value
+		if cal.Color != "" {
+			props[calendarColorName] = internal.PropFindValue(&calendarColor{
+				ColorValue: cal.Color,
+			})
+		}
+
 		props[supportedCalendarDataName] = internal.PropFindValue(&supportedCalendarData{
 			Types: []calendarDataType{
 				{ContentType: ical.MIMEType, Version: "2.0"},

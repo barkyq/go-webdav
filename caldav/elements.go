@@ -48,6 +48,15 @@ type calendarTimezone struct {
 	Data    []byte   `xml:",chardata"`
 }
 
+// undocumented property; used by apple calendar apps and davx5 for android
+// use only the hex color value
+type calendarColor struct {
+	XMLName    xml.Name `xml:"http://apple.com/ns/ical/ calendar-color"`
+	ColorValue string   `xml:",chardata"`
+}
+
+var calendarColorName = xml.Name{Space: "http://apple.com/ns/ical/", Local: "calendar-color"}
+
 // https://tools.ietf.org/html/rfc4791#section-5.2.4
 type supportedCalendarData struct {
 	XMLName xml.Name           `xml:"urn:ietf:params:xml:ns:caldav supported-calendar-data"`
@@ -249,5 +258,6 @@ type mkcalendarReq struct {
 	DisplayName                   string                        `xml:"set>prop>displayname"`
 	CalendarDescription           string                        `xml:"set>prop>calendar-description"`
 	CalendarTimezone              []byte                        `xml:"set>prop>calendar-timezone"`
+	CalendarColor                 string                        `xml:"set>prop>calendar-color"`
 	// TODO this could also contain max-resource-size, calendar-timezone, calendar-color, etc...
 }
