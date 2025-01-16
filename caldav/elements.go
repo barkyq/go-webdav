@@ -17,6 +17,7 @@ var (
 	supportedCalendarDataName         = xml.Name{namespace, "supported-calendar-data"}
 	supportedCalendarComponentSetName = xml.Name{namespace, "supported-calendar-component-set"}
 	maxResourceSizeName               = xml.Name{namespace, "max-resource-size"}
+	calendarTimezoneName              = xml.Name{namespace, "calendar-timezone"}
 
 	calendarQueryName    = xml.Name{namespace, "calendar-query"}
 	calendarMultigetName = xml.Name{namespace, "calendar-multiget"}
@@ -39,6 +40,12 @@ func (a *calendarHomeSet) GetXMLName() xml.Name {
 type calendarDescription struct {
 	XMLName     xml.Name `xml:"urn:ietf:params:xml:ns:caldav calendar-description"`
 	Description string   `xml:",chardata"`
+}
+
+// https://datatracker.ietf.org/doc/html/rfc4791#section-5.2.2
+type calendarTimezone struct {
+	XMLName xml.Name `xml:"urn:ietf:params:xml:ns:caldav calendar-timezone"`
+	Data    []byte   `xml:",chardata"`
 }
 
 // https://tools.ietf.org/html/rfc4791#section-5.2.4
@@ -241,5 +248,6 @@ type mkcalendarReq struct {
 	SupportedCalendarComponentSet supportedCalendarComponentSet `xml:"set>prop>supported-calendar-component-set"`
 	DisplayName                   string                        `xml:"set>prop>displayname"`
 	CalendarDescription           string                        `xml:"set>prop>calendar-description"`
+	CalendarTimezone              []byte                        `xml:"set>prop>calendar-timezone"`
 	// TODO this could also contain max-resource-size, calendar-timezone, calendar-color, etc...
 }

@@ -104,6 +104,14 @@ func (h *Handler) handleMkCalendar(w http.ResponseWriter, r *http.Request) error
 			return internal.HTTPErrorf(http.StatusBadRequest, "caldav: error parsing mkcalendar request: %s", err.Error())
 		}
 
+		if m.CalendarTimezone != nil {
+			if tz, err := ical.NewDecoder(bytes.NewBuffer(m.CalendarTimezone)).Decode(); err != nil {
+				return internal.HTTPErrorf(http.StatusBadRequest, "caldav: error parsing timezone: %s", err.Error())
+			} else {
+				cal.Timezone = tz
+			}
+		}
+
 		cal.Name = m.DisplayName
 		cal.Description = m.CalendarDescription
 
@@ -586,6 +594,15 @@ func (b *backend) propFindCalendar(ctx context.Context, propfind *internal.PropF
 				return nil, err
 			}
 			return &internal.CurrentUserPrincipal{Href: internal.Href{Path: path}}, nil
+		}
+		if cal.Timezone != nil {
+			props[calendarTimezoneName] = func(*internal.RawXMLValue) (interface{}, error) {
+				buf := bytes.NewBuffer(nil)
+				if err := ical.NewEncoder(buf).Encode(cal.Timezone); err != nil {
+					return nil, err
+				}
+				return &calendarTimezone{Data: buf.Bytes()}, nil
+			}
 		}
 		props[supportedCalendarDataName] = internal.PropFindValue(&supportedCalendarData{
 			Types: []calendarDataType{

@@ -69,6 +69,7 @@ type Calendar struct {
 	Description           string
 	MaxResourceSize       int64
 	SupportedComponentSet []string
+	Timezone              *ical.Calendar
 }
 
 type CalendarCompRequest struct {
